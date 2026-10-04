@@ -3,76 +3,253 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Habit Tracker</title>
+  <title>Habit Tracker Pro</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
-    body { background-color: #000; color: #fff; padding: 20px 16px 100px; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    h1 { font-size: 28px; font-weight: 700; }
-    .btn-add { background: #0A84FF; color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: 600; font-size: 15px; cursor: pointer; }
-    .habits-container { display: flex; flex-direction: column; gap: 12px; }
-    .habit-card { background: #1c1c1e; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .habit-info { display: flex; align-items: center; gap: 12px; }
-    .habit-emoji { font-size: 24px; background: rgba(255,255,255,0.08); padding: 8px; border-radius: 12px; }
-    .habit-title { font-size: 17px; font-weight: 600; }
-    .habit-streak { font-size: 13px; color: #8E8E93; margin-top: 2px; }
-    .check-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #0A84FF; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; }
-    .check-btn.completed { background: #30D158; border-color: #30D158; }
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px; z-index: 100; }
-    .modal-content { background: #1c1c1e; width: 100%; max-width: 350px; border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
-    .modal h2 { margin-bottom: 16px; font-size: 20px; }
-    input { width: 100%; background: #2c2c2e; border: none; padding: 12px; border-radius: 10px; color: white; margin-bottom: 12px; font-size: 16px; outline: none; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-    .btn-secondary { background: #2c2c2e; color: white; border: none; padding: 10px 16px; border-radius: 10px; }
+    :root {
+      --bg: #000000;
+      --card-bg: #1c1c1e;
+      --text: #ffffff;
+      --text-sec: #8e8e93;
+      --accent: #0a84ff;
+      --success: #30d158;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px 16px 100px;
+      padding-top: max(20px, env(safe-area-inset-top));
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .btn-add {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-add:active {
+      opacity: 0.7;
+    }
+
+    .habits-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .habit-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .habit-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .habit-emoji {
+      font-size: 24px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+    }
+
+    .habit-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .habit-streak {
+      font-size: 13px;
+      color: var(--text-sec);
+      margin-top: 2px;
+    }
+
+    .check-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .check-btn.completed {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: #2c2c2e;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .modal h2 {
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+
+    input {
+      width: 100%;
+      background: #1c1c1e;
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .btn-secondary {
+      background: #3a3a3c;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-sec);
+      margin-top: 40px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Mis Hábitos</h1>
-    <button class="btn-add" id="btnOpen">+ Nuevo</button>
+    <button class="btn-add" onclick="openModal()">+ Nuevo</button>
   </header>
 
   <div class="habits-container" id="habitsList"></div>
 
+  <!-- Modal Nuevo Hábito -->
   <div class="modal" id="habitModal">
     <div class="modal-content">
       <h2>Añadir Hábito</h2>
-      <input type="text" id="habitEmoji" placeholder="Emoji (ej. 🏃, 💧, 📖)" value="✨">
+      <input type="text" id="habitEmoji" placeholder="Emoji (ej. 🏃, 💧, 📖)" maxlength="2">
       <input type="text" id="habitName" placeholder="Nombre del hábito">
       <div class="modal-actions">
-        <button class="btn-secondary" id="btnClose">Cancelar</button>
-        <button class="btn-add" id="btnSave">Guardar</button>
+        <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn-add" onclick="saveHabit()">Guardar</button>
       </div>
     </div>
   </div>
 
   <script>
-    var habits = JSON.parse(localStorage.getItem('my_habits_v2')) || [
+    var habits = JSON.parse(localStorage.getItem('my_iphone_habits')) || [
       { id: 1, name: 'Beber 2L de Agua', emoji: '💧', completed: false, streak: 3 },
-      { id: 2, name: 'Hacer Ejercicio', emoji: '🏋️‍♂️', completed: false, streak: 1 }
+      { id: 2, name: 'Hacer Ejercicio', emoji: '🏋️️‍♂️', completed: false, streak: 1 }
     ];
 
     function renderHabits() {
       var container = document.getElementById('habitsList');
       container.innerHTML = '';
+
+      if (habits.length === 0) {
+        container.innerHTML = '<div class="empty-state">No tienes hábitos aún. ¡Añade uno nuevo arriba!</div>';
+        return;
+      }
       
       habits.forEach(function(habit) {
         var card = document.createElement('div');
         card.className = 'habit-card';
         card.innerHTML = 
           '<div class="habit-info">' +
-            '<span class="habit-emoji">' + habit.emoji + '</span>' +
+            '<span class="habit-emoji">' + (habit.emoji || '✨') + '</span>' +
             '<div>' +
               '<div class="habit-title">' + habit.name + '</div>' +
               '<div class="habit-streak">🔥 Racha de ' + habit.streak + ' días</div>' +
             '</div>' +
           '</div>' +
-          '<button class="check-btn ' + (habit.completed ? 'completed' : '') + '" onclick="toggleHabit(' + habit.id + ')">' + (habit.completed ? '✓' : '') + '</button>';
+          '<button class="check-btn ' + (habit.completed ? 'completed' : '') + '" onclick="toggleHabit(' + habit.id + ')">' + 
+            (habit.completed ? '✓' : '') + 
+          '</button>';
         container.appendChild(card);
       });
       
-      localStorage.setItem('my_habits_v2', JSON.stringify(habits));
+      localStorage.setItem('my_iphone_habits', JSON.stringify(habits));
     }
 
     function toggleHabit(id) {
@@ -85,24 +262,34 @@
       renderHabits();
     }
 
-    document.getElementById('btnOpen').onclick = function() {
+    function openModal() {
       document.getElementById('habitModal').style.display = 'flex';
-    };
+      document.getElementById('habitName').focus();
+    }
 
-    document.getElementById('btnClose').onclick = function() {
+    function closeModal() {
       document.getElementById('habitModal').style.display = 'none';
-    };
+      document.getElementById('habitName').value = '';
+      document.getElementById('habitEmoji').value = '';
+    }
 
-    document.getElementById('btnSave').onclick = function() {
-      var name = document.getElementById('habitName').value;
-      var emoji = document.getElementById('habitEmoji').value || '✨';
+    function saveHabit() {
+      var name = document.getElementById('habitName').value.trim();
+      var emoji = document.getElementById('habitEmoji').value.trim() || '✨';
+      
       if (!name) return;
 
-      habits.push({ id: Date.now(), name: name, emoji: emoji, completed: false, streak: 0 });
-      document.getElementById('habitName').value = '';
-      document.getElementById('habitModal').style.display = 'none';
+      habits.push({
+        id: Date.now(),
+        name: name,
+        emoji: emoji,
+        completed: false,
+        streak: 0
+      });
+
+      closeModal();
       renderHabits();
-    };
+    }
 
     renderHabits();
   </script>
