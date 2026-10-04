@@ -2,535 +2,176 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Today Habits Pro</title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mini Web Royale</title>
   <style>
-    :root {
-      --bg: #000000;
-      --card-bg: #121214;
-      --text: #ffffff;
-      --text-sec: #8e8e93;
-      --border: rgba(255, 255, 255, 0.1);
-      --modal-bg: #1c1c1e;
-      --nav-bg: rgba(20, 20, 22, 0.85);
-    }
-
-    body.light-mode {
-      --bg: #f2f2f7;
-      --card-bg: #ffffff;
-      --text: #000000;
-      --text-sec: #6c6c70;
-      --border: rgba(0, 0, 0, 0.08);
-      --modal-bg: #ffffff;
-      --nav-bg: rgba(255, 255, 255, 0.85);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "SF Pro Display", sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 16px;
-      padding-top: max(20px, env(safe-area-inset-top));
-      padding-bottom: 100px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    /* Top Bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .pill-btn {
-      background: var(--card-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .add-btn {
-      background: var(--card-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    h1 {
-      font-size: 34px;
-      font-weight: 800;
-      margin-bottom: 20px;
-      letter-spacing: -0.5px;
-    }
-
-    /* Tabs Content */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Grid Layout */
-    .habits-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    /* Habit Card */
-    .habit-card {
-      border-radius: 22px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 160px;
-      position: relative;
-      transition: transform 0.15s ease;
-      border: 1px solid var(--border);
-    }
-
-    .habit-card:active { transform: scale(0.97); }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .streak-count {
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .streak-unit {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      opacity: 0.7;
-      margin-top: 4px;
-    }
-
-    .check-circle {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: none;
-      color: #fff;
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .habit-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .week-dots {
-      display: flex;
-      gap: 3px;
-      align-items: center;
-    }
-
-    .dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      font-size: 9px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.25);
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    .dot.active {
-      background: rgba(255, 255, 255, 0.95);
-      color: #000;
-    }
-
-    .week-ratio {
-      font-size: 11px;
-      font-weight: 600;
-      margin-left: auto;
-      opacity: 0.7;
-    }
-
-    /* Themes */
-    .theme-blue { background: #12213a; color: #64b5f6; } .theme-blue .check-circle { background: #1e88e5; }
-    .theme-pink { background: #2d1822; color: #f48fb1; } .theme-pink .check-circle { background: #ec407a; }
-    .theme-green { background: #11281d; color: #81c784; } .theme-green .check-circle { background: #43a047; }
-    .theme-orange { background: #2d1e12; color: #ffb74d; } .theme-orange .check-circle { background: #fb8c00; }
-    .theme-red { background: #2c1616; color: #e57373; } .theme-red .check-circle { background: #e53935; }
-    .theme-purple { background: #201830; color: #b39ddb; } .theme-purple .check-circle { background: #8e24aa; }
-    .theme-cyan { background: #10262b; color: #4dd0e1; } .theme-cyan .check-circle { background: #00acc1; }
-    .theme-yellow { background: #2a2713; color: #fff176; } .theme-yellow .check-circle { background: #fdd835; }
-    .habit-card .habit-title, .habit-card .streak-count { color: #ffffff; }
-
-    /* Stats Section */
-    .stats-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 16px;
-    }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .stat-box { background: rgba(125,125,125,0.08); padding: 14px; border-radius: 16px; text-align: center; }
-    .stat-val { font-size: 26px; font-weight: 800; color: #0a84ff; }
-    .stat-lbl { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
-
-    /* Settings Section */
-    .settings-list { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
-    .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); }
-    .setting-item:last-child { border-bottom: none; }
-    .delete-btn { background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-
-    /* Bottom Nav Bar */
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--nav-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 0.5px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-      z-index: 90;
-    }
-    .nav-item { color: var(--text-sec); text-decoration: none; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; cursor: pointer; }
-    .nav-item.active { color: #0a84ff; }
-    .nav-icon { font-size: 20px; }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 100;
-    }
-    .modal-content { background: var(--modal-bg); width: 100%; max-width: 340px; border-radius: 24px; padding: 22px; border: 1px solid var(--border); }
-    .modal h2 { margin-bottom: 16px; font-size: 20px; }
-    input, select { width: 100%; background: rgba(125,125,125,0.12); border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: var(--text); margin-bottom: 12px; font-size: 15px; outline: none; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-    .btn-cancel { background: rgba(125,125,125,0.2); color: var(--text); border: none; padding: 10px 16px; border-radius: 12px; }
-    .btn-save { background: #0a84ff; color: white; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; }
+    body { background: #222; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 10px; }
+    canvas { background: #4CAF50; border: 4px solid #333; border-radius: 8px; max-width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    .ui { margin-top: 15px; display: flex; justify-content: center; gap: 20px; align-items: center; }
+    .btn { background: #2196F3; color: white; border: none; padding: 15px 25px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .btn:active { background: #1976D2; transform: scale(0.95); }
+    .elixir-bar { width: 200px; height: 20px; background: #555; border-radius: 10px; overflow: hidden; border: 2px solid #fff; }
+    .elixir-fill { width: 0%; height: 100%; background: #E91E63; transition: width 0.1s; }
   </style>
 </head>
 <body>
 
-  <!-- TAB HOY -->
-  <div id="tab-today" class="tab-content active">
-    <div class="top-bar">
-      <button class="pill-btn" onclick="syncData()">⇄ Sync</button>
-      <button class="add-btn" onclick="openModal()">+</button>
+  <h2>👑 Mini Royale</h2>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  
+  <div class="ui">
+    <div class="elixir-bar">
+      <div class="elixir-fill" id="elixirFill"></div>
     </div>
-    <h1>Today</h1>
-    <div class="habits-grid" id="habitsGrid"></div>
+    <button class="btn" onclick="spawnPlayerUnit()">⚔️ Caballero (3)</button>
   </div>
-
-  <!-- TAB ESTADÍSTICAS -->
-  <div id="tab-stats" class="tab-content">
-    <h1>Estadísticas</h1>
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-val" id="totalCompletions">0</div>
-        <div class="stat-lbl">Completados</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" id="bestStreak">0</div>
-        <div class="stat-lbl">Mejor Racha</div>
-      </div>
-    </div>
-    <div class="stats-card">
-      <h3 style="margin-bottom: 12px; font-size: 16px;">Progreso Semanal</h3>
-      <canvas id="weeklyChart" height="180"></canvas>
-    </div>
-  </div>
-
-  <!-- TAB AJUSTES -->
-  <div id="tab-settings" class="tab-content">
-    <h1>Ajustes</h1>
-    
-    <h3 style="margin: 16px 0 8px; font-size: 14px; color: var(--text-sec); text-transform: uppercase;">Aariencia</h3>
-    <div class="settings-list">
-      <div class="setting-item">
-        <span>Modo Oscuro</span>
-        <input type="checkbox" id="themeToggle" onchange="toggleTheme()" checked style="width: auto; margin:0;">
-      </div>
-    </div>
-
-    <h3 style="margin: 20px 0 8px; font-size: 14px; color: var(--text-sec); text-transform: uppercase;">Gestionar Hábitos</h3>
-    <div class="settings-list" id="manageHabitsList"></div>
-
-    <h3 style="margin: 20px 0 8px; font-size: 14px; color: var(--text-sec); text-transform: uppercase;">Copia de Seguridad</h3>
-    <div class="settings-list">
-      <div class="setting-item" onclick="exportData()">
-        <span>Exportar Datos (JSON)</span>
-        <span>📥</span>
-      </div>
-      <div class="setting-item" onclick="resetAll()">
-        <span style="color: #ff3b30;">Resetear todos los datos</span>
-        <span>⚠️</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Nuevo Hábito -->
-  <div class="modal" id="habitModal">
-    <div class="modal-content">
-      <h2>Nuevo Hábito</h2>
-      <input type="text" id="habitName" placeholder="Nombre (ej. Meditate, Read)">
-      <select id="habitIcon">
-        <option value="💧">💧 Gota (Agua/Días)</option>
-        <option value="🔥">🔥 Fuego (Racha/Semanas)</option>
-      </select>
-      <select id="habitTheme">
-        <option value="theme-blue">Azul</option>
-        <option value="theme-pink">Rosa</option>
-        <option value="theme-green">Verde</option>
-        <option value="theme-orange">Naranja</option>
-        <option value="theme-red">Rojo</option>
-        <option value="theme-purple">Morado</option>
-        <option value="theme-cyan">Cian</option>
-        <option value="theme-yellow">Amarillo</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-        <button class="btn-save" onclick="saveHabit()">Crear</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom Nav -->
-  <nav>
-    <div class="nav-item active" onclick="switchTab('today')">
-      <span class="nav-icon">📅</span>
-      <span>Hoy</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('stats')">
-      <span class="nav-icon">📊</span>
-      <span>Stats</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('settings')">
-      <span class="nav-icon">⚙️</span>
-      <span>Ajustes</span>
-    </div>
-  </nav>
 
   <script>
-    var habits = JSON.parse(localStorage.getItem('pro_habits_v2')) || [
-      { id: 1, name: 'Meditate', streak: 48, icon: '💧', unit: 'DAYS', theme: 'theme-blue', completed: false, week: [1,1,1,1,1,0,0] },
-      { id: 2, name: 'Work out', streak: 116, icon: '🔥', unit: 'WEEKS', theme: 'theme-pink', completed: true, week: [1,0,1,1,0,0,0] },
-      { id: 3, name: 'Read', streak: 21, icon: '💧', unit: 'WEEKS', theme: 'theme-green', completed: false, week: [1,1,1,1,0,0,0] },
-      { id: 4, name: 'Guitar', streak: 236, icon: '🔥', unit: 'DAYS', theme: 'theme-orange', completed: false, week: [1,1,1,1,1,0,0] }
-    ];
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-    var daysLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    var myChart = null;
+    // Variables del juego
+    let elixir = 5;
+    let enemyElixir = 5;
+    const maxElixir = 10;
+    const units = [];
+    
+    // Bases (Torres)
+    const playerBase = { x: 200, y: 550, hp: 1000, maxHp: 1000, color: '#2196F3' };
+    const enemyBase = { x: 200, y: 50, hp: 1000, maxHp: 1000, color: '#F44336' };
 
-    function renderGrid() {
-      var grid = document.getElementById('habitsGrid');
-      grid.innerHTML = '';
-
-      habits.forEach(function(h) {
-        var completedDays = h.week.reduce((a, b) => a + b, 0);
-        var dotsHtml = h.week.map(function(active, i) {
-          return '<div class="dot ' + (active ? 'active' : '') + '">' + daysLetters[i] + '</div>';
-        }).join('');
-
-        var card = document.createElement('div');
-        card.className = 'habit-card ' + h.theme;
-        card.innerHTML = 
-          '<div>' +
-            '<div class="card-header">' +
-              '<div>' +
-                '<div class="streak-count">' + h.streak + ' ' + h.icon + '</div>' +
-                '<div class="streak-unit">' + h.unit + '</div>' +
-              '</div>' +
-              '<button class="check-circle" onclick="toggleCheck(' + h.id + ')">' + (h.completed ? '✓' : '') + '</button>' +
-            '</div>' +
-          '</div>' +
-          '<div>' +
-            '<div class="habit-title">' + h.name + '</div>' +
-            '<div class="week-dots">' + dotsHtml + '<span class="week-ratio">' + completedDays + '/7</span></div>' +
-          '</div>';
-
-        grid.appendChild(card);
-      });
-
-      localStorage.setItem('pro_habits_v2', JSON.stringify(habits));
-      renderSettingsList();
-    }
-
-    function toggleCheck(id) {
-      habits = habits.map(function(h) {
-        if (h.id === id) {
-          var isDone = !h.completed;
-          return Object.assign({}, h, {
-            completed: isDone,
-            streak: isDone ? h.streak + 1 : Math.max(0, h.streak - 1)
-          });
-        }
-        return h;
-      });
-      renderGrid();
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      
-      document.getElementById('tab-' + tab).classList.add('active');
-      event.currentTarget.classList.add('active');
-
-      if (tab === 'stats') updateStats();
-    }
-
-    function renderSettingsList() {
-      var list = document.getElementById('manageHabitsList');
-      list.innerHTML = '';
-      habits.forEach(function(h) {
-        var item = document.createElement('div');
-        item.className = 'setting-item';
-        item.innerHTML = '<span>' + h.icon + ' ' + h.name + '</span>' +
-          '<button class="delete-btn" onclick="deleteHabit(' + h.id + ')">Eliminar</button>';
-        list.appendChild(item);
-      });
-    }
-
-    function deleteHabit(id) {
-      if (confirm('¿Seguro que quieres eliminar este hábito?')) {
-        habits = habits.filter(h => h.id !== id);
-        renderGrid();
+    class Unit {
+      constructor(isPlayer) {
+        this.isPlayer = isPlayer;
+        this.x = isPlayer ? 180 + Math.random() * 40 : 180 + Math.random() * 40;
+        this.y = isPlayer ? 500 : 100;
+        this.size = 20;
+        this.hp = 150;
+        this.maxHp = 150;
+        this.damage = 20;
+        this.speed = isPlayer ? -1.5 : 1.5;
+        this.color = isPlayer ? '#64B5F6' : '#E57373';
+        this.attackCooldown = 0;
       }
-    }
 
-    function updateStats() {
-      var total = habits.reduce((acc, h) => acc + h.streak, 0);
-      var maxStreak = habits.length ? Math.max(...habits.map(h => h.streak)) : 0;
-      
-      document.getElementById('totalCompletions').innerText = total;
-      document.getElementById('bestStreak').innerText = maxStreak;
+      update() {
+        // Encontrar enemigo más cercano (unidad o torre)
+        let target = null;
+        let minDist = 50; // Rango de ataque
 
-      var ctx = document.getElementById('weeklyChart').getContext('2d');
-      if (myChart) myChart.destroy();
-
-      myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-          datasets: [{
-            label: 'Completados',
-            data: [3, 5, 4, 6, 5, 2, 4],
-            backgroundColor: '#0a84ff',
-            borderRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { display: false } },
-            y: { grid: { color: 'rgba(125,125,125,0.1)' } }
+        // Buscar unidades enemigas
+        for (let u of units) {
+          if (u.isPlayer !== this.isPlayer && u.hp > 0) {
+            let dist = Math.abs(this.y - u.y);
+            if (dist < minDist && Math.abs(this.x - u.x) < 30) {
+              target = u;
+            }
           }
         }
-      });
-    }
 
-    function toggleTheme() {
-      var isChecked = document.getElementById('themeToggle').checked;
-      if (isChecked) {
-        document.body.classList.remove('light-mode');
-      } else {
-        document.body.classList.add('light-mode');
+        // Si no hay unidades en rango, ver si la torre está en rango
+        let enemyTower = this.isPlayer ? enemyBase : playerBase;
+        if (!target && Math.abs(this.y - enemyTower.y) < 60) {
+          target = enemyTower;
+        }
+
+        if (target) {
+          // Atacar
+          if (this.attackCooldown <= 0) {
+            target.hp -= this.damage;
+            this.attackCooldown = 60; // 1 ataque por segundo aprox (a 60fps)
+          }
+        } else {
+          // Moverse
+          this.y += this.speed;
+        }
+
+        this.attackCooldown--;
+      }
+
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        
+        // Barra de vida de la unidad
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.x - 10, this.y - 15, 20, 4);
+        ctx.fillStyle = '#00FF00';
+        ctx.fillRect(this.x - 10, this.y - 15, 20 * (this.hp / this.maxHp), 4);
       }
     }
 
-    function syncData() { alert('¡Datos sincronizados con la nube local de tu iPhone!'); }
-    function exportData() {
-      var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(habits));
-      var downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "mis_habitos_backup.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+    function spawnPlayerUnit() {
+      if (elixir >= 3) {
+        elixir -= 3;
+        units.push(new Unit(true));
+      }
     }
 
-    function resetAll() {
-      if (confirm('⚠️ ¿Quieres borrar todos los datos y empezar de cero?')) {
-        localStorage.clear();
+    function enemyAI() {
+      if (enemyElixir >= 4) { // El enemigo espera a tener 4 de elixir
+        enemyElixir -= 3;
+        units.push(new Unit(false));
+      }
+    }
+
+    function drawBase(base) {
+      ctx.fillStyle = base.color;
+      ctx.fillRect(base.x - 40, base.y - 40, 80, 80);
+      
+      // Vida de la base
+      ctx.fillStyle = 'black';
+      ctx.fillRect(base.x - 40, base.y - 60, 80, 10);
+      ctx.fillStyle = '#00FF00';
+      ctx.fillRect(base.x - 40, base.y - 60, 80 * (base.hp / base.maxHp), 10);
+    }
+
+    function gameLoop() {
+      // Limpiar pantalla
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Generar elixir
+      if (elixir < maxElixir) elixir += 0.02;
+      if (enemyElixir < maxElixir) enemyElixir += 0.02;
+      document.getElementById('elixirFill').style.width = (elixir * 10) + '%';
+
+      enemyAI();
+
+      // Dibujar torres
+      drawBase(playerBase);
+      drawBase(enemyBase);
+
+      // Actualizar y dibujar unidades
+      for (let i = units.length - 1; i >= 0; i--) {
+        let u = units[i];
+        if (u.hp <= 0) {
+          units.splice(i, 1); // Eliminar muertos
+          continue;
+        }
+        u.update();
+        u.draw();
+      }
+
+      // Comprobar fin del juego
+      if (playerBase.hp <= 0) {
+        alert("¡Has perdido! La torre roja te destruyó.");
         location.reload();
+        return;
       }
+      if (enemyBase.hp <= 0) {
+        alert("¡VICTORIA! Destruiste la torre enemiga.");
+        location.reload();
+        return;
+      }
+
+      requestAnimationFrame(gameLoop);
     }
 
-    function openModal() { document.getElementById('habitModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('habitModal').style.display = 'none'; }
-
-    function saveHabit() {
-      var name = document.getElementById('habitName').value;
-      var icon = document.getElementById('habitIcon').value;
-      var theme = document.getElementById('habitTheme').value;
-      if (!name) return;
-
-      habits.push({
-        id: Date.now(),
-        name: name,
-        streak: 1,
-        icon: icon,
-        unit: icon === '🔥' ? 'WEEKS' : 'DAYS',
-        theme: theme,
-        completed: false,
-        week: [1, 0, 0, 0, 0, 0, 0]
-      });
-
-      closeModal();
-      renderGrid();
-    }
-
+    // Iniciar juego
+    gameLoop();
+  </script>
+</body>
+</html>
     renderGrid();
   </script>
 </body>
